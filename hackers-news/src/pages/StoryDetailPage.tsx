@@ -80,16 +80,32 @@ export function StoryDetailPage() {
       </nav>
 
       {/* Hero Section (LCP 대상) */}
-      <header className="pt-6 text-center space-y-2">
+      <header className="pt-6 space-y-2">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-50 leading-tight">
           {story.title}
         </h1>
-        <p className="text-sm text-slate-400">
-          by <span className="font-semibold">{story.by}</span>
-        </p>
-        <p>
-          <span className="text-sm text-slate-400">{postedAt}</span>
-        </p>
+
+        <div className="flex flex-wrap items-center gap-3 text-sm text-slate-400">
+          <p>
+            by{" "}
+            <span className="font-semibold text-brand">
+              {story.by ?? "unknown"}
+            </span>
+          </p>
+
+          <span>•</span>
+
+          <p>
+            score:{" "}
+            <span className="font-semibold text-slate-200">
+              {story.score ?? 0}
+            </span>
+          </p>
+
+          <span>•</span>
+
+          <p>{postedAt}</p>
+        </div>
 
         {story.url && (
           <p>
