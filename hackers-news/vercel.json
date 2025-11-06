@@ -2,12 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "frontend/package.json",
+      "src": "hackers-news/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "frontend/dist" }
+      "config": { "distDir": "hackers-news/dist" }
     }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "frontend/dist/$1" }
+    {
+      "src": "/(.*)",
+      "dest": "hackers-news/dist/index.html"
+    }
   ]
 }
