@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: Nanum Gothic Coding
+- Font Author: undefined
+- Font Source: https://fonts.gstatic.com/s/nanumgothiccoding/v26/8QIYdjzHisX_8vv59_xMxtPFW4IXROws8xgecsV88t5V9r4.ttf
+- Font License: undefined)

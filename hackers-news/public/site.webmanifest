@@ -1,0 +1,26 @@
+{
+  "name": "Hacker News Viewer",
+  "short_name": "HN Viewer",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#ff6600",
+  "background_color": "#0f172a",
+  "description": "Hacker News Viewer",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
