@@ -9,7 +9,7 @@ React + Vite 기반의 Hacker News 클라이언트입니다.
 [Hacker News Viewer](https://aipia-frontend-assignment-mu.vercel.app/)
 
 ---
-
+ 
 ## 🚀 주요 기술 스택
 
 | 구분 | 기술 |
