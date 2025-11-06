@@ -5,6 +5,11 @@ React + Vite 기반의 Hacker News 클라이언트입니다.
 
 ---
 
+### 🔗 배포 URL
+[Hacker News Viewer](https://aipia-frontend-assignment-mu.vercel.app/)
+
+---
+ 
 ## 🚀 주요 기술 스택
 
 | 구분 | 기술 |
@@ -48,20 +53,17 @@ src/
 - **댓글 트리 구조** 재귀 렌더링 ($CommentItem$)  
 - 초기 5개의 루트 댓글만 표시, “Show all comments”로 전체 보기  
 - 각 대댓글은 “View replies / Hide replies”로 토글 가능  
-- HTML 댓글 본문을 $DOMPurify$로 안전 렌더링
+- HTML 댓글 본문을 $DOMPurify$로 안전하게 렌더링
 
 ### ⚡ 3. 성능 최적화
 - 코드 스플리팅 ($manualChunks$)  
 - Brotli + gzip 압축  
 - Critical CSS 인라인 및 JS defer 처리  
 - React.memo, Suspense로 렌더링 최소화  
-- Lighthouse 기준:
-  - **Desktop: 100점**
-  - **Mobile: 90점 이상 (LCP < 1.0s)**
 
 ### 📱 4. PWA 지원
 - $vite-plugin-pwa$ 기반 서비스워커 자동 등록  
-- 앱 설치 가능 (Add to Home Screen)  
+- 홈 화면 추가 가능 (Add to Home Screen)  
 - 오프라인 캐시 일부 지원
 
 ---
@@ -88,15 +90,9 @@ npx serve dist -l 5173
 
 ## 🧭 Lighthouse 성능 결과
 
-| 항목 | Desktop | Mobile |
-|------|----------|---------|
-| Performance | **100** | **90~93** |
-| LCP | 0.9s | 1.0s |
-| TBT | 120ms | 180ms |
-| CLS | 0.01 | 0.02 |
-
-> ✅ React SPA 구조임에도 LCP 1초 이하 유지  
-> ✅ 모바일 성능 최적화 완료 (defer, lazy load, memoization)
+- 코드 스플리팅 및 리소스 압축으로 초기 로드 최적화  
+- React.memo, lazy loading, JS defer 처리로 렌더링 지연 최소화  
+- LCP 1초 이하 유지 (Desktop 100점, Mobile 약 90점 수준)
 
 ---
 
@@ -105,7 +101,7 @@ npx serve dist -l 5173
 - React 18의 Suspense 활용한 로딩 분리
 - Zustand로 전역 상태 최소화 및 캐싱
 - 댓글 5개만 초기 렌더 → 성능 향상
-- Vite PWA 자동 등록으로 오프라인 대응
+- Vite PWA 자동 등록으로 정적 리소스 캐싱 및 오프라인 접근 지원
 - Tailwind Utility Class로 일관된 반응형 레이아웃
 
 ---
