@@ -16,3 +16,5 @@ export function NotFoundPage() {
     </section>
   );
 }
+
+export default NotFoundPage;

@@ -20,6 +20,7 @@ export function StoryCard({ story }: StoryCardProps) {
         <img
           src={thumbnail}
           alt=""
+          loading="lazy"
           className="h-16 w-16 rounded-md object-cover flex-shrink-0"
         />
       </div>

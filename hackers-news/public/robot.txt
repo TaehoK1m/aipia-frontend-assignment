@@ -1,0 +1,9 @@
+# robots.txt for Hacker News
+User-agent: *
+Allow: /
+
+# Prevent crawling of build assets
+Disallow: /assets/
+
+# Sitemap (optional)
+Sitemap: https://your-domain.com/sitemap.xml

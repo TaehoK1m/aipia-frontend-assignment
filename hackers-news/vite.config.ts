@@ -1,13 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import compression from "vite-plugin-compression";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    compression({ algorithm: "brotliCompress", ext: ".br" }),
+    compression({ algorithm: "gzip", ext: ".gz" }),
     VitePWA({
-      registerType: "autoUpdate", // 서비스워커 자동 업데이트
+      registerType: "autoUpdate",
+      injectRegister: "auto",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
       manifest: {
         name: "Hacker News Viewer",
@@ -31,8 +34,46 @@ export default defineConfig({
       },
     }),
   ],
+
   server: {
     port: 5173,
     open: true,
+  },
+
+  //  React 의존성 중복 방지 (핵심)
+  optimizeDeps: {
+    include: ["react", "react-dom"],
+  },
+
+  build: {
+    minify: "esbuild",
+    sourcemap: false,
+    chunkSizeWarningLimit: 800,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            //  React 관련 분리 금지 — Vite가 자동 처리
+            if (
+              id.includes("react") ||
+              id.includes("react-dom") ||
+              id.includes("react-router-dom")
+            ) {
+              return;
+            }
+            if (id.includes("zustand")) return "zustand";
+            if (id.includes("date-fns")) return "date-fns";
+            if (id.includes("dompurify")) return "dompurify";
+            return "vendor";
+          }
+        },
+      },
+    },
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
   },
 });

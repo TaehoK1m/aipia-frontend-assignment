@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import DOMPurify from "dompurify";
 import { formatRelativeTime } from "../utils/formatRelativeTime";
 import type { CommentNode } from "../types/hn";
@@ -8,7 +8,17 @@ interface CommentItemProps {
   depth?: number;
 }
 
-export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
+/**
+ * 단일 댓글 및 대댓글을 재귀적으로 렌더링하는 컴포넌트
+ * - 루트 댓글 5개까지만 StoryDetailPage에서 표시하며,
+ *   이후 댓글은 "Show all comments" 버튼으로 로드됨
+ * - 각 댓글의 대댓글(children)은 이 컴포넌트 내부에서
+ *   "View replies" / "Hide replies" 버튼으로 개별 토글
+ */
+export const CommentItem = memo(function CommentItem({
+  comment,
+  depth = 0,
+}: CommentItemProps) {
   // 대댓글 펼침 여부 상태 관리 (기본: 닫힘)
   const [expanded, setExpanded] = useState(false);
 
@@ -54,7 +64,7 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
       {/* 자식 댓글 (대댓글) */}
       {comment.children?.length > 0 && (
         <div className="mt-3 space-y-3">
-          {/* 대댓글이 접혀 있는 경우 */}
+          {/* 접혀 있을 때: "View replies" 버튼만 표시 */}
           {!expanded ? (
             <button
               onClick={() => setExpanded(true)}
@@ -65,7 +75,7 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
             </button>
           ) : (
             <>
-              {/* 대댓글이 펼쳐져 있는 경우 */}
+              {/* 펼쳐졌을 때: "Hide replies" 버튼 + 대댓글 목록 표시 */}
               <button
                 onClick={() => setExpanded(false)}
                 className="text-xs text-slate-400 hover:text-brand transition"
@@ -73,7 +83,6 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
                 Hide replies ▲
               </button>
 
-              {/* 재귀적으로 대댓글 렌더링 */}
               <div className="mt-2 space-y-3">
                 {comment.children.map((child) => (
                   <CommentItem
@@ -89,4 +98,4 @@ export function CommentItem({ comment, depth = 0 }: CommentItemProps) {
       )}
     </div>
   );
-}
+});

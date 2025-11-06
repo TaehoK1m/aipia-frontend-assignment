@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Link, useParams } from "react-router-dom";
-
 import { Loader } from "../components/Loader";
 import { ErrorState } from "../components/ErrorState";
-import { useStoryDetailStore } from "../store/useStoryDetailStore";
 import { CommentItem } from "../components/CommentItem";
+import { useStoryDetailStore } from "../store/useStoryDetailStore";
 import { formatRelativeTime } from "../utils/formatRelativeTime";
 
 export function StoryDetailPage() {
@@ -17,7 +16,7 @@ export function StoryDetailPage() {
     isLoading,
     error,
     fetchDetail,
-    loadAllComments, // 댓글 전체보기
+    loadAllComments,
     reset,
   } = useStoryDetailStore();
 
@@ -26,26 +25,22 @@ export function StoryDetailPage() {
 
   useEffect(() => {
     if (!Number.isFinite(storyId)) return;
-
-    // 로컬 상태도 초기화 (깜빡임 줄이기 + 일관성)
     setShowAll(false);
     setIsLoadingComments(false);
-
-    fetchDetail(storyId).catch(() => {
-      // 에러는 store 내부에서 처리
-    });
-
-    return () => {
-      reset();
-    };
+    fetchDetail(storyId).catch(() => {});
+    return () => reset();
   }, [storyId, fetchDetail, reset]);
 
   if (!Number.isFinite(storyId)) {
     return <ErrorState message="Invalid story id." />;
   }
 
-  if (isLoading) {
-    return <Loader label="Loading story" />;
+  if (isLoading && !story) {
+    return (
+      <section className="flex flex-col items-center justify-center h-64 text-slate-400">
+        <Loader label="Loading story" />
+      </section>
+    );
   }
 
   if (error) {
@@ -63,7 +58,6 @@ export function StoryDetailPage() {
 
   const postedAt = formatRelativeTime(story.time);
 
-  // URL 안전 파싱
   let host = "";
   try {
     if (story.url) {
@@ -75,82 +69,88 @@ export function StoryDetailPage() {
 
   return (
     <article className="space-y-6">
-      {/* 상단 네비게이션 */}
-      <div className="flex items-center gap-4 text-sm text-brand">
+      {/* 상단 네비게이션 (돌아가기 버튼) */}
+      <nav className="sticky top-0 z-10 flex items-center gap-4 bg-slate-950/90 backdrop-blur px-4 py-3 border-b border-slate-800">
         <Link
           to="/"
-          className="rounded-full border border-brand px-4 py-2 font-semibold hover:bg-brand hover:text-slate-950 transition"
+          className="rounded-full border border-brand px-4 py-2 text-sm font-semibold text-brand hover:bg-brand hover:text-slate-950 transition"
         >
           ← Back
         </Link>
-        <span>{postedAt}</span>
-      </div>
+      </nav>
 
-      {/* 본문 헤더 */}
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold text-slate-50">{story.title}</h1>
-
-        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
-          <span>by {story.by ?? "unknown"}</span>
-          <span>score: {story.score ?? 0}</span>
-          <span>{story.descendants ?? 0} comments</span>
-        </div>
+      {/* Hero Section (LCP 대상) */}
+      <header className="pt-6 text-center space-y-2">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-50 leading-tight">
+          {story.title}
+        </h1>
+        <p className="text-sm text-slate-400">
+          by <span className="font-semibold">{story.by}</span>
+        </p>
+        <p>
+          <span className="text-sm text-slate-400">{postedAt}</span>
+        </p>
 
         {story.url && (
-          <a
-            href={story.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex max-w-full items-center gap-2 overflow-hidden break-words text-sm font-semibold text-brand hover:text-brand-dark"
-            title={story.url}
-          >
-            <span className="truncate">{host || story.url}</span>
-            <span className="shrink-0">↗</span>
-          </a>
-        )}
-
-        {story.text && (
-          <div
-            className="prose prose-invert max-w-none text-base"
-            dangerouslySetInnerHTML={{ __html: story.text }}
-          />
+          <p>
+            <a
+              href={story.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand underline hover:text-brand-dark transition"
+            >
+              {host || story.url}
+            </a>
+          </p>
         )}
       </header>
 
+      {/* 본문 텍스트 */}
+      {story.text && (
+        <div
+          className="prose prose-invert max-w-none text-base"
+          dangerouslySetInnerHTML={{ __html: story.text }}
+        />
+      )}
+
       {/* 댓글 섹션 */}
-      <section className="mt-8 space-y-4">
-        <h2 className="text-xl font-semibold text-slate-100">
-          Comments ({story.descendants ?? 0})
-        </h2>
+      <section className="mt-10 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-slate-100">
+            Comments ({story.descendants ?? 0})
+          </h2>
+        </div>
 
-        {comments.length === 0 ? (
-          <p className="text-slate-500">No comments available.</p>
-        ) : (
-          comments.map((comment) => (
-            <CommentItem key={comment.id} comment={comment} />
-          ))
-        )}
-
-        {/* 전체 보기 버튼 + 로딩 상태 */}
-        {!showAll && comments.length < (story.descendants ?? 0) && (
-          <button
-            onClick={async () => {
-              setIsLoadingComments(true);
-              await loadAllComments(storyId);
-              setIsLoadingComments(false);
-              setShowAll(true);
-            }}
-            disabled={isLoadingComments}
-            className={`mt-4 rounded-full px-4 py-2 text-sm font-semibold transition ${
-              isLoadingComments
-                ? "bg-brand/60 text-slate-950 cursor-not-allowed"
-                : "bg-brand hover:bg-brand-dark text-slate-950"
-            }`}
-          >
-            {isLoadingComments ? "Loading comments..." : "Show all comments"}
-          </button>
-        )}
+        <Suspense fallback={<Loader label="Loading comments" />}>
+          {comments.length === 0 ? (
+            <p className="text-slate-500">No comments available.</p>
+          ) : (
+            (showAll ? comments : comments.slice(0, 5)).map((comment) => (
+              <CommentItem key={comment.id} comment={comment} />
+            ))
+          )}
+        </Suspense>
       </section>
+      {!showAll && comments.length < (story.descendants ?? 0) && (
+        <button
+          onClick={async () => {
+            setIsLoadingComments(true);
+            await loadAllComments(storyId);
+            setIsLoadingComments(false);
+            setShowAll(true);
+          }}
+          disabled={isLoadingComments}
+          className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+            isLoadingComments
+              ? "bg-brand/60 text-slate-950 cursor-not-allowed"
+              : "bg-brand hover:bg-brand-dark text-slate-950"
+          }`}
+        >
+          {isLoadingComments ? "Loading comments..." : "Show all comments"}
+        </button>
+      )}
     </article>
   );
 }
+
+export default StoryDetailPage;
