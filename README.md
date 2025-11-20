@@ -6,7 +6,7 @@ React + Vite 기반의 Hacker News 클라이언트입니다.
 ---
 
 ### 🔗 배포 URL
-[Hacker News Viewer](https://aipia-frontend-assignment-4yntxquzj.vercel.app/)
+[Hacker News Viewer](https://aipia-frontend-assignment-mu.vercel.app/)
 
 ---
  
